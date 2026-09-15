@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProSales — Адмін-панель</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="/schema.js"></script>
+<style>
+:root{
+  --wine:#521019;--wine-2:#7d1120;--paper:#fbf6f2;--card:#fff;
+  --ink:#2a1519;--ink-2:#8a7873;--line:#ece0db;--line-2:#f3eae5;
+  --gold:#c09a48;--gold-2:#d8bd77;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Onest",system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{color:var(--wine-2)}
+header{background:linear-gradient(168deg,#521019,#340811);color:#ecdfc9;padding:22px 30px;display:flex;align-items:center;gap:12px}
+header .mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(140deg,var(--gold-2),var(--gold));display:grid;place-items:center;color:#241a09;font-family:"Unbounded";font-weight:600;font-size:15px}
+header b{font-weight:600;font-size:16px}
+header span{color:#b79a8f;font-size:13px;margin-left:auto}
+main{max-width:1000px;margin:0 auto;padding:30px 22px 80px}
+h1{font-family:"Unbounded";font-weight:600;font-size:22px;margin:0 0 4px}
+.sub{color:var(--ink-2);font-size:14px;margin:0 0 26px}
+.new{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:26px}
+.new input{flex:1;min-width:220px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit}
+.new input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(192,154,72,.18)}
+.btn{border:none;border-radius:10px;padding:12px 20px;font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.btn.gold{background:linear-gradient(140deg,var(--gold-2),var(--gold));color:#241a09}
+.btn.gold:hover{transform:translateY(-1px)}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink-2)}
+.btn.ghost:hover{border-color:var(--ink-2);color:var(--ink)}
+table.list{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+table.list th{background:#faf3ee;text-align:left;font-size:12px;font-weight:600;color:var(--ink-2);padding:12px 14px;text-transform:none}
+table.list td{padding:13px 14px;border-top:1px solid var(--line-2);font-size:14px;vertical-align:middle}
+.name{font-weight:600}
+.status{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
+.s-new{background:#f0ece6;color:#7a6f64}
+.s-in_progress{background:#fbf1e0;color:#8a6a1e}
+.s-submitted{background:#e7f0e3;color:#4e7a3e}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.rowbtns .btn{padding:8px 12px;font-size:13px}
+.empty{color:var(--ink-2);font-style:italic}
+.linkline{display:flex;gap:8px;align-items:center;margin-top:12px;background:#fbf1e0;border:1px solid #ecd9a6;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#6a5320}
+.linkline code{font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+/* AI analysis */
+.aiwrap{margin-top:32px;border-top:2px solid var(--gold);padding-top:18px}
+.aihead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.aibody{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.aibody h4.aih{font-family:"Unbounded";font-weight:500;font-size:14px;color:var(--wine-2);margin:16px 0 6px}
+.aibody h4.aih:first-child{margin-top:0}
+.aibody ul{margin:6px 0 10px;padding-left:20px}
+.aibody li{margin:5px 0;font-size:14px;line-height:1.5}
+.aibody p{font-size:14px;line-height:1.55;margin:8px 0}
+/* viewer */
+.modal{position:fixed;inset:0;background:rgba(40,20,25,.5);display:none;align-items:flex-start;justify-content:center;padding:24px;z-index:20;overflow:auto}
+.modal.on{display:flex}
+.sheet{background:var(--paper);max-width:820px;width:100%;border-radius:16px;padding:26px 28px 40px;position:relative}
+.sheet .x{position:absolute;top:16px;right:18px;border:none;background:none;font-size:24px;color:var(--ink-2);cursor:pointer;line-height:1}
+.sheet h2{font-family:"Unbounded";font-weight:600;font-size:22px;margin:0 0 2px}
+.sheet .meta{color:var(--ink-2);font-size:13.5px;margin-bottom:22px}
+.sheet h3{font-family:"Unbounded";font-weight:500;font-size:15px;color:var(--wine-2);margin:26px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.qa{margin-bottom:14px}
+.qa .q{font-weight:600;font-size:13.5px;margin-bottom:3px}
+.qa .a{font-size:14px;color:#40342f;line-height:1.5}
+.qa .a a{display:inline-block}
+table.mini{border-collapse:collapse;margin-top:4px;font-size:13px;width:100%}
+table.mini th{background:#faf3ee;text-align:left;padding:6px 9px;border:1px solid var(--line);font-weight:600;color:var(--ink-2)}
+table.mini td{padding:6px 9px;border:1px solid var(--line-2)}
+@media(max-width:640px){
+  table.list thead{display:none}
+  table.list td{display:block;border:none;padding:4px 14px}
+  table.list tr{display:block;border-top:1px solid var(--line);padding:10px 0}
+  .rowbtns{justify-content:flex-start;margin-top:6px}
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="mark">P</span><b>Pro Sales Agency</b><span>Адмін-панель онбордингу</span>
+</header>
+<main>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap">
+    <div>
+      <h1>Клієнти</h1>
+      <p class="sub" style="margin-bottom:0">Створіть посилання під клієнта, надішліть його — і всі відповіді та файли зберуться тут.</p>
+    </div>
+    <a class="btn ghost" href="/api/admin/export.json">Експорт усіх (JSON)</a>
+  </div>
+  <div style="height:26px"></div>
+
+  <div class="new">
+    <input id="cname" placeholder="Ім'я клієнта або назва проєкту" onkeydown="if(event.key==='Enter')createClient()">
+    <button class="btn gold" onclick="createClient()">Створити посилання</button>
+  </div>
+  <div id="lastlink"></div>
+
+  <table class="list">
+    <thead><tr><th>Клієнт</th><th>Статус</th><th>Створено</th><th>Надіслано</th><th></th></tr></thead>
+    <tbody id="rows"><tr><td colspan="5" class="empty">Завантаження…</td></tr></tbody>
+  </table>
+</main>
+
+<div class="modal" id="viewer"><div class="sheet"><button class="x" onclick="closeView()">×</button><div id="vbody"></div></div></div>
+
+<script>
+const SCHEMA = window.PSA_SCHEMA || [];
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dt = s => s ? new Date(s).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
+const STAT = {new:'Новий',in_progress:'Заповнює',submitted:'Надіслано'};
+
+async function load(){
+  const r = await fetch('/api/admin/clients');
+  const rows = await r.json();
+  const tb = document.getElementById('rows');
+  if(!rows.length){ tb.innerHTML = '<tr><td colspan="5" class="empty">Ще немає клієнтів. Створіть перше посилання вище.</td></tr>'; return; }
+  tb.innerHTML = rows.map(c => `
+    <tr>
+      <td class="name">${esc(c.name)}</td>
+      <td><span class="status s-${c.status}">${STAT[c.status]||c.status}</span></td>
+      <td>${dt(c.created_at)}</td>
+      <td>${dt(c.submitted_at)}</td>
+      <td><div class="rowbtns">
+        <button class="btn ghost" onclick="copyLink('${c.token}')">Копіювати лінк</button>
+        <button class="btn ghost" onclick="view(${c.id})">Переглянути</button>
+        <button class="btn ghost" onclick="del(${c.id},'${esc(c.name)}')">✕</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function createClient(){
+  const inp = document.getElementById('cname');
+  const name = inp.value.trim(); if(!name) return;
+  const r = await fetch('/api/admin/clients',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})});
+  const d = await r.json();
+  const link = location.origin + '/f/' + d.token;
+  inp.value = '';
+  document.getElementById('lastlink').innerHTML =
+    `<div class="linkline">Посилання для «${esc(name)}»: <code>${esc(link)}</code>
+     <button class="btn gold" style="padding:7px 12px;font-size:13px" onclick="navigator.clipboard.writeText('${link}')">Копіювати</button></div>`;
+  load();
+}
+
+function copyLink(token){ navigator.clipboard.writeText(location.origin + '/f/' + token); }
+
+async function del(id,name){
+  if(!confirm('Видалити «'+name+'» разом з усіма відповідями та файлами?')) return;
+  await fetch('/api/admin/clients/'+id,{method:'DELETE'});
+  load();
+}
+
+function fmt(f, v){
+  const t = f.t;
+  const empty = v==null || v==='' || (Array.isArray(v)&&v.length===0);
+  if(empty) return '<span class="empty">—</span>';
+  if(t==='text'||t==='ta'||t==='tabig') return esc(v).replace(/\n/g,'<br>');
+  if(t==='row2'||t==='row3') return v.filter(Boolean).map(esc).join(' · ') || '<span class="empty">—</span>';
+  if(t==='check') return v.map(i=>esc(f.o[i])).join(', ');
+  if(t==='radiox'){ let s = v.sel>=0 ? esc(f.o[v.sel]) : ''; if(v.extra) s += (s?' — ':'')+esc(v.extra); return s || '<span class="empty">—</span>'; }
+  if(t==='drop'||t==='dropbig') return v.map(x=>`<a href="/api/admin/files/${x.id}">${esc(x.name)}</a>`).join('<br>');
+  if(t==='tbl'||t==='cards'){
+    const rows = v.filter(r=>r.some(c=>c&&c.trim()));
+    if(!rows.length) return '<span class="empty">—</span>';
+    return '<table class="mini"><tr>'+f.cols.map(c=>`<th>${esc(c)}</th>`).join('')+'</tr>'+
+      rows.map(r=>'<tr>'+r.map(c=>`<td>${esc(c||'')}</td>`).join('')+'</tr>').join('')+'</table>';
+  }
+  if(t==='journey'){
+    return '<table class="mini"><tr><th>Етап</th><th>Що відбувається</th><th>Відповідальний</th><th>Канал</th><th>Наст. крок</th></tr>'+
+      f.stages.map((s,ri)=>{const r=v[ri]||[];return `<tr><td>${esc(s)}</td><td>${esc(r[0]||'')}</td><td>${esc(r[1]||'')}</td><td>${esc(r[2]||'')}</td><td>${esc(r[3]||'')}</td></tr>`;}).join('')+'</table>';
+  }
+  if(t==='cal') return f.items.map((it,i)=> v[i] ? `${esc(it)}: <b>${esc(v[i])}</b>` : null).filter(Boolean).join('<br>') || '<span class="empty">—</span>';
+  return esc(String(v));
+}
+
+async function view(id){
+  const r = await fetch('/api/admin/clients/'+id);
+  const c = await r.json();
+  const a = c.answers || {};
+  let html = `<h2>${esc(c.name)}</h2><div class="meta"><span class="status s-${c.status}">${STAT[c.status]||c.status}</span> &nbsp; Створено ${dt(c.created_at)}${c.submitted_at?' · Надіслано '+dt(c.submitted_at):''}</div>`;
+  SCHEMA.forEach((s,si)=>{
+    html += `<h3>${si+1}. ${esc(s.n)}</h3>`;
+    s.f.forEach((f,fi)=>{
+      html += `<div class="qa"><div class="q">${esc(f.l||'')}</div><div class="a">${fmt(f, a['s'+si+'_f'+fi])}</div></div>`;
+    });
+  });
+  html += `<div class="aiwrap">
+    <div class="aihead">
+      <h3 style="border:none;margin:0">Питання для продуктового дзвінка (AI)</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn ghost" href="/api/admin/clients/${c.id}/dossier.md">Завантажити .md</a>
+        <button class="btn gold" id="genBtn" onclick="analyze(${c.id})">${c.analysis?'Перегенерувати':'Згенерувати'}</button>
+      </div>
+    </div>
+    <div id="aibody" class="aibody">${c.analysis?md(c.analysis):'<span class="empty">Ще не згенеровано. Натисніть «Згенерувати» — AI знайде прогалини у брифі й підготує питання для дзвінка.</span>'}</div>
+  </div>`;
+  document.getElementById('vbody').innerHTML = html;
+  document.getElementById('viewer').classList.add('on');
+}
+function closeView(){ document.getElementById('viewer').classList.remove('on'); }
+document.getElementById('viewer').addEventListener('click', e=>{ if(e.target.id==='viewer') closeView(); });
+
+function md(t){
+  const lines=String(t).split('\n'); let html=''; let inList=false;
+  const close=()=>{ if(inList){ html+='</ul>'; inList=false; } };
+  for(let raw of lines){
+    const line=raw.trimEnd();
+    if(!line.trim()){ close(); continue; }
+    let s=esc(line).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    let m;
+    if(m=s.match(/^#{1,4}\s+(.*)$/)){ close(); html+='<h4 class="aih">'+m[1]+'</h4>'; }
+    else if(m=s.match(/^(?:\d+\.|[-*])\s+(.*)$/)){ if(!inList){ html+='<ul>'; inList=true; } html+='<li>'+m[1]+'</li>'; }
+    else { close(); html+='<p>'+s+'</p>'; }
+  }
+  close();
+  return html;
+}
+
+async function analyze(id){
+  const btn=document.getElementById('genBtn'), body=document.getElementById('aibody');
+  btn.disabled=true; btn.textContent='Генерую…';
+  body.innerHTML='<span class="empty">AI аналізує бриф… зазвичай 10–30 секунд.</span>';
+  try{
+    const r=await fetch('/api/admin/clients/'+id+'/analyze',{method:'POST'});
+    const d=await r.json();
+    if(!r.ok){ body.innerHTML='<span class="empty">'+esc(d.message||'Помилка')+'</span>'; btn.textContent='Спробувати ще'; }
+    else{ body.innerHTML=md(d.analysis); btn.textContent='Перегенерувати'; load(); }
+  }catch(e){ body.innerHTML='<span class="empty">Помилка мережі</span>'; btn.textContent='Спробувати ще'; }
+  btn.disabled=false;
+}
+
+load();
+</script>
+</body>
+</html>
