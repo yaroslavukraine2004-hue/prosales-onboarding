@@ -577,7 +577,18 @@ function next(){
 }
 function prev(){ if(cur>0) go(cur-1); }
 async function finish(){ refresh(); try{ await fetch(API+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers:serialize()})}); }catch(e){} document.getElementById('done').classList.add('on'); }
-function begin(){ document.getElementById('intro').style.display='none'; document.getElementById('app').classList.add('on'); refresh(); }
+async function begin(){
+  const btn=document.querySelector('.start');
+  let orig;
+  if(btn && !dataLoaded){ orig=btn.textContent; btn.disabled=true; btn.textContent='Завантаження…'; }
+  await initPromise; // wait for any saved answers to load BEFORE the form becomes editable —
+  // otherwise a slow /api/form fetch can resolve after the user already started typing and
+  // deserialize() would overwrite what they just entered.
+  if(btn){ btn.disabled=false; if(orig) btn.textContent=orig; }
+  document.getElementById('intro').style.display='none';
+  document.getElementById('app').classList.add('on');
+  refresh();
+}
 
 refresh();
 
@@ -630,6 +641,7 @@ function deserialize(data){
 
 const LEAD=document.getElementById('lead');
 const LEAD_BASE=LEAD?LEAD.textContent:'';
+let dataLoaded=false;
 function escHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 async function init(){
   if(!token){ if(LEAD) LEAD.textContent='Посилання недійсне.'; const st=document.querySelector('.start'); if(st) st.style.display='none'; return; }
@@ -640,8 +652,9 @@ async function init(){
     const byKey={}; (d.files||[]).forEach(f=>{ (byKey[f.field_key]=byKey[f.field_key]||[]).push({id:f.id,name:f.orig_name}); });
     Object.keys(byKey).forEach(k=>{ if(!(FILES[k]&&FILES[k].length)){ FILES[k]=byKey[k]; const w=document.querySelector('[data-k="'+k+'"]'); if(w) renderFiles(w,k); } });
   }catch(e){ if(LEAD) LEAD.textContent='Не вдалося завантажити форму. Онови сторінку.'; }
+  dataLoaded=true;
 }
-init();
+const initPromise=init();
 </script>
 </body>
 </html>
